@@ -21,9 +21,10 @@ async def home():
         return HTMLResponse(content=html_content)
 
 @app.get("/{full_path:path}")
-def catch_all(full_path: str):
-    not_found_message = {"detail": f"Page '/{full_path}' not found"}
-    return Response(content=json.dumps(not_found_message), status_code=404, media_type="application/json")
+def error():
+   with open("404.html", "r",encoding="utf-8") as file:
+       html_content=file.read()
+       return HTMLResponse(content=html_content)
 
 
 class Books(BaseModel):
@@ -56,5 +57,4 @@ async def get_auth(request:Request):
     auth = request.headers.get("Authorization")
     if auth is None:
         raise HTTPException(status_code=401,detail="Authorization header missing")
-    if
 
