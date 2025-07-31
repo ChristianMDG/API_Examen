@@ -12,7 +12,7 @@ app = FastAPI()
 
 @app.get("/ping")
 async def ping():
-    return {"pong": "pong"}
+    return Response("pong")
 
 @app.get("/home")
 async def home():
@@ -57,4 +57,6 @@ async def get_auth(request:Request):
     auth = request.headers.get("Authorization")
     if auth is None:
         raise HTTPException(status_code=401,detail="Authorization header missing")
-
+    if auth != "123456":
+        raise HTTPException(status_code=401,detail="Authorization header invalid")
+    return Response("pong")
