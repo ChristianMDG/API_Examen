@@ -2,10 +2,10 @@
 
 from typing import List
 
-import datetime
+
 from fastapi import FastAPI, Request, HTTPException
-from pydantic.v1 import BaseModel
-from starlette.responses import HTMLResponse
+from pydantic import BaseModel, json
+from starlette.responses import HTMLResponse, Response
 
 app = FastAPI()
 
@@ -20,11 +20,17 @@ async def home():
         html_content=file.read()
         return HTMLResponse(content=html_content)
 
+@app.get("/{full_path:path}")
+def catch_all(full_path: str):
+    not_found_message = {"detail": f"Page '/{full_path}' not found"}
+    return Response(content=json.dumps(not_found_message), status_code=404, media_type="application/json")
+
+
 class Books(BaseModel):
     author: str
     title: str
     content: str
-    creation_date:datetime.datetime
+    creation_date:str
 
 book_db :List[Books] =[]
 @app.post("/posts")
@@ -41,8 +47,14 @@ async def update_posts(book:Books):
     for i,existing_book in enumerate(book_db):
         if book.title == existing_book.title:
             book_db[i] = book
-        book_db.append(book)
-        return book_db
+    book_db.append(book)
+    return book_db
 
 
+@app.get("/get/ping/auth")
+async def get_auth(request:Request):
+    auth = request.headers.get("Authorization")
+    if auth is None:
+        raise HTTPException(status_code=401,detail="Authorization header missing")
+    if
 
